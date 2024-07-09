@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Enviar Fotos{% endblock %}
+{% block page_title %}Enviar Fotos{% endblock %}
+{% block content %}
+<form action="/upload" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="files">Escolher foto:</label>
+        <input type="file" class="form-control-file" id="files" name="files" multiple>
+    </div>
+    <button type="submit" class="btn btn-primary">Enviar</button>
+</form>
+{% endblock %}

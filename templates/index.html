@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Fotos e Vídeos dos Cultos{% endblock %}
+{% block page_title %}Galeria{% endblock %}
+{% block content %}
+<hr>
+<div class="row">
+    <div class="col-md-6">
+        <div class="d-flex align-items-center">
+            <img src="{{ url_for('static', filename='images/fotos_icon.png') }}" alt="icon_foto" width="40" height="36" class="d-inline-block align-text-center">
+            <h3 class="ms-2">Fotos</h3>
+        </div>
+        <div class="row">
+            {% for foto in fotos if foto.tipo == 'imagem' %}
+            <div class="col-md-4 mb-3">
+                <div class="thumbnail">
+                    <a href="{{ url_for('static', filename='uploads/' ~ foto.filename) }}" data-lightbox="gallery" data-title="{{ foto.filename }}">
+                        <img src="{{ url_for('static', filename='uploads/' ~ foto.filename) }}" class="img-thumbnail" alt="Foto" style="width:100%">
+                        <div class="caption">
+                            <p>{{ foto.filename }}</p>
+                        </div>
+                    </a>
+                    {% if 'user_id' in session %}
+                    <form action="{{ url_for('delete_photo', photo_id=foto.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
+                    </form>
+                    {% endif %}
+                    <a href="{{ url_for('download_photo', filename=foto.filename) }}" class="btn btn-success btn-sm">Download</a>
+                    <hr>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="d-flex align-items-center">
+            <img src="{{ url_for('static', filename='images/video_icon.png') }}" alt="icon_video" width="40" height="36" class="d-inline-block align-text-center">
+            <h3 class="ms-2">Vídeos</h3>
+        </div>
+        <div class="row">
+            {% for foto in fotos if foto.tipo == 'video' %}
+            <div class="col-md-4 mb-3">
+                <div class="thumbnail">
+                    <video width="100%" controls>
+                        <source src="{{ url_for('static', filename='uploads/' ~ foto.filename) }}" data-lightbox="video" alt="Vídeo" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <p>{{ foto.filename }}</p>
+                    {% if 'user_id' in session %}
+                    <form action="{{ url_for('delete_photo', photo_id=foto.id) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Deletar</button>
+                    </form>
+                    {% endif %}
+                    <a href="{{ url_for('download_photo', filename=foto.filename) }}" class="btn btn-success btn-sm">Download</a>
+                    <hr>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

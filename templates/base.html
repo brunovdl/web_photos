@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="/">
+            <img src="/static/images/logoieq.png" alt="logo" width="40" height="36" class="d-inline-block align-text-center">
+            <b>Fotos dos Cultos</b>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="nav nav-tabs">
+                {% if 'user_id' in session %}
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/"><b>Galeria</b></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/upload"><b>Upload</b></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/register"><b>Registrar</b></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/logout"><b>Logout</b></a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/"><b>Galeria</b></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/login"><b>Login</b></a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <span class="navbar-text ml-auto">
+                {% if 'user_id' in session %}
+                    <b>{{ session['username']}}</b>
+                    <button class="btn btn-outline-light btn-sm ml-2" onclick="openCamera()"><b>Abrir Câmera</b></button>
+                {% else %}
+                    <b>Visitante</b>
+                {% endif %}
+            </span>
+        </div>
+    </nav>
+
+    <div class="container mt-5 pt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert alert-light" role="alert">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>  
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <h1 class="mt-4">{% block page_title %}{% endblock %}</h1>
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').fadeOut('slow', function() {
+                    $(this).alert('close');
+                });
+            }, 3000);
+        });
+
+        function openCamera() {
+            console.log("Abrindo a câmera..");
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true}).then(function(stream) {
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.play();
+                    document.body.appendChild(video);
+                    video.style.position = 'fixed';
+                    video.style.top = '50%';
+                    video.style.left = '50%';
+                    video.style.transform = 'translate(-50%, -50%)';
+                    video.style.zIndex = '9999';
+                    video.style.widht = '80%';
+                    video.style.height = '80%';
+
+                    video.onclick = function() {
+                        stream.getTracks().forEach(track => track.stop());
+                        document.body.removeChild(video);
+                    };
+                }).catch(function(error) {
+                    console.log("Erro ao acessar a câmera: ", error);
+                    alert("Erro ao acessar a camera." + error.message);
+                    if (error.name === 'NotAllowedError') {
+                            alert('Permissão de câmera negada. Por favor, permita o acesso à câmera e tente novamente.');
+                        } else if (error.name === 'NotFoundError') {
+                            alert('Nenhuma câmera encontrada. Por favor, conecte uma câmera e tente novamente.');
+                        } else if (error.name === 'NotReadableError') {
+                            alert('Câmera está sendo usada por outra aplicação. Por favor, feche outras aplicações que possam estar usando a câmera e tente novamente.');
+                        } else if (error.name === 'OverconstrainedError') {
+                            alert('As configurações de vídeo não são suportadas pela sua câmera.');
+                        } else {
+                            alert('Erro desconhecido: ' + error.message);
+                        }
+                });
+            } else {
+                alert("Navegador não suporta acesso a câmera.");
+            }
+        }
+
+        light.option({
+            'albumLabel': "Imagem %1 de %2",
+            'wrapAround': true
+        });
+
+        $(document).on('lightbox:change', function(event) {
+            var currentImage = $('.lb-image').attr('src');
+            var downloadLink = $('<a>', {
+                text: 'Download',
+                class: 'btn bn-sucess btn-sm ml-2',
+                href: currentImage,
+                download: currentImage.split('/').pop()
+            });
+
+            var caption = $('.lb-caption');
+            !caption.find('a').remove();
+            caption.append(downloadLink);
+        });
+    </script>
+</body>
+</html>

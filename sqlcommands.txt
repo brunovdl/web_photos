@@ -1,0 +1,26 @@
+## SELECT
+
+SELECT *FROM database.fotos
+
+## DELETE
+
+DELETE FROM
+    database.fotos
+    WHERE
+    id = <id do item>
+
+## UPDATE
+
+UPDATE database.users
+    SET password = 'ieqjpmidia'
+    WHERE id = 7;
+
+## INSERT
+
+INSERT INTO database.users (username, password)
+VALUES ('Bruno', 'ieqmidia')
+
+## ADD COLUM in TABLE
+
+ALTER TABLE database.fotos 
+    ADD COLUMN tipo TEXT;
