@@ -40,10 +40,12 @@
             {% for foto in fotos if foto.tipo == 'video' %}
             <div class="col-md-4 mb-3">
                 <div class="thumbnail">
-                    <video width="100%" controls>
-                        <source src="{{ url_for('static', filename='uploads/' ~ foto.filename) }}" data-lightbox="video" alt="Vídeo" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
+                    <a class="venobox" data-vbtype="video" href="{{ url_for('static', filename='uploads/' ~ foto.filename) }}">
+                        <video width="100%" controls>
+                            <source src="{{ url_for('static', filename='uploads/' ~ foto.filename) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </a>
                     <p>{{ foto.filename }}</p>
                     {% if 'user_id' in session %}
                     <form action="{{ url_for('delete_photo', photo_id=foto.id) }}" method="post" style="display:inline;">
